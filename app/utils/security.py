@@ -21,7 +21,7 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(password.encode(), hashed_password.encode())
 
 def generate_token(username: str) -> str:
-    expiration = datetime.utcnow() + timedelta(hours=1)  # Exemple de durée d'expiration
+    expiration = datetime.utcnow() + timedelta(hours=72)  # Exemple de durée d'expiration
     payload = {
         "sub": username,
         "exp": expiration,

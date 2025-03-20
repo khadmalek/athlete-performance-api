@@ -1,3 +1,4 @@
+import sqlite3
 from fastapi import APIRouter, HTTPException, status, Depends, Header
 from typing import List
 from app.schemas.performance import PerformanceCreate, PerformanceResponse
@@ -134,3 +135,193 @@ def delete_performance(id_performance: int, token: str = Depends(get_token_from_
     # Retourner la performance supprimée dans la réponse
     return performance_to_delete
 
+
+# Lire puissance max
+@router.get("/puissance/details")
+def get_performance(token: str = Depends(get_token_from_header)):
+    id_user = get_current_user(token)
+
+
+    conn = get_db_connection()
+    conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
+    cursor = conn.cursor()
+
+    # Construction sécurisée de la requête SQL
+    sql_query = f"""
+        SELECT u.nom, u.prenom, date_performance,
+               max(power_max) AS power_max, hr_max,
+               vo2_max, rf_max, cadence_max,
+               vo2_class, ressenti
+        FROM performances p  join users u on p.id_user = u.id_user
+    """
+
+    cursor.execute(sql_query)
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        # Renvoie un dictionnaire avec uniquement les champs que vous voulez
+        return {
+            "nom": row["nom"],
+            "prenom": row["prenom"],
+            "date_performance": row["date_performance"],
+            "power_max": row["power_max"],
+            "hr_max": row["hr_max"],
+            "vo2_max": row["vo2_max"],
+            "rf_max": row["rf_max"],
+            "cadence_max": row["cadence_max"],
+            "vo2_class": row["vo2_class"],
+            "ressenti": row["ressenti"]
+        }
+    else:
+        return {"message": "Aucune performance trouvée."}
+
+# Lire puissance max
+@router.get("/puissance/detail/{id_user}")
+def get_performance(id_user: int, token: str = Depends(get_token_from_header)):
+    #id_user = get_current_user(token)
+
+
+    conn = get_db_connection()
+    conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
+    cursor = conn.cursor()
+
+    # Construction sécurisée de la requête SQL
+    sql_query = f"""
+        SELECT u.nom, u.prenom, date_performance,
+               max(power_max) AS power_max, hr_max,
+               vo2_max, rf_max, cadence_max,
+               vo2_class, ressenti
+        FROM performances p  join users u on p.id_user = u.id_user
+        WHERE p.id_user = ?
+    """
+
+    cursor.execute(sql_query, (id_user,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        # Renvoie un dictionnaire avec uniquement les champs que vous voulez
+        return {
+            "nom": row["nom"],
+            "prenom": row["prenom"],
+            "date_performance": row["date_performance"],
+            "power_max": row["power_max"],
+            "hr_max": row["hr_max"],
+            "vo2_max": row["vo2_max"],
+            "rf_max": row["rf_max"],
+            "cadence_max": row["cadence_max"],
+            "vo2_class": row["vo2_class"],
+            "ressenti": row["ressenti"]
+        }
+    else:
+        return {"message": "Aucune performance trouvée."}
+
+# Lire VO2max max
+@router.get("/VO2max/details")
+def get_performance(token: str = Depends(get_token_from_header)):
+  
+    conn = get_db_connection()
+    conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
+    cursor = conn.cursor()
+
+    # Construction sécurisée de la requête SQL
+    sql_query = f"""
+        SELECT u.nom, u.prenom, date_performance,
+               power_max, hr_max,
+               max(vo2_max) AS VO2_max, rf_max, cadence_max,
+               vo2_class, ressenti
+        FROM performances p  join users u on p.id_user = u.id_user
+    """
+
+    cursor.execute(sql_query)
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        # Renvoie un dictionnaire avec uniquement les champs que vous voulez
+        return {
+            "nom": row["nom"],
+            "prenom": row["prenom"],
+            "date_performance": row["date_performance"],
+            "power_max": row["power_max"],
+            "hr_max": row["hr_max"],
+            "vo2_max": row["vo2_max"],
+            "rf_max": row["rf_max"],
+            "cadence_max": row["cadence_max"],
+            "vo2_class": row["vo2_class"],
+            "ressenti": row["ressenti"]
+        }
+    else:
+        return {"message": "Aucune performance trouvée."}
+    
+# Lire VO2max max
+@router.get("/VO2max/detail/{id_user}")
+def get_performance(id_user: int, token: str = Depends(get_token_from_header)):
+  
+    conn = get_db_connection()
+    conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
+    cursor = conn.cursor()
+
+    # Construction sécurisée de la requête SQL
+    sql_query = f"""
+        SELECT u.nom, u.prenom, date_performance,
+               power_max, hr_max,
+               max(vo2_max) AS VO2_max, rf_max, cadence_max,
+               vo2_class, ressenti
+        FROM performances p  join users u on p.id_user = u.id_user
+        WHERE p.id_user = ?
+    """
+
+    cursor.execute(sql_query, (id_user,))
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        # Renvoie un dictionnaire avec uniquement les champs que vous voulez
+        return {
+            "nom": row["nom"],
+            "prenom": row["prenom"],
+            "date_performance": row["date_performance"],
+            "power_max": row["power_max"],
+            "hr_max": row["hr_max"],
+            "vo2_max": row["vo2_max"],
+            "rf_max": row["rf_max"],
+            "cadence_max": row["cadence_max"],
+            "vo2_class": row["vo2_class"],
+            "ressenti": row["ressenti"]
+        }
+    else:
+        return {"message": "Aucune performance trouvée."}
+    
+# Lire rapport poids/puissance max
+@router.get("/poidspuissance/details")
+def get_performances(token: str = Depends(get_token_from_header)): 
+    conn = get_db_connection()
+    conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
+    cursor = conn.cursor()
+
+    # Construction sécurisée de la requête SQL
+    sql_query = f"""
+        SELECT u.nom, u.prenom, AVG(p.power_max / d.weight) AS rapport_moyen
+        FROM users u
+        JOIN performances p ON u.id_user = p.id_user
+        JOIN details d ON u.id_user = d.id_user
+        GROUP BY u.nom, u.prenom
+        ORDER BY rapport_moyen DESC
+        LIMIT 1;
+    """
+
+    cursor.execute(sql_query,)
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        # Renvoie un dictionnaire avec uniquement les champs que vous voulez
+        return {
+            "nom": row["nom"],
+            "prenom": row["prenom"],
+            "rapport_moyen": row["rapport_moyen"]
+        }
+    else:
+        return {"message": "Aucune performance trouvée."}
