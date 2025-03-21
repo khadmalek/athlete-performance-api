@@ -1,0 +1,22 @@
+{
+  "name": "sbj_1",
+  "power.max": 360.0,
+  "hr.max": 192.0,
+  "vo2.max": 4650.0,
+  "rf.max": 59.0,
+  "cadence.max": 153,
+  "vo2.class": [74, 88],
+  "csv_trial_1": [
+    "sbj_1_II.csv",
+    "sbj_1_incremental.csv",
+    "sbj_1_Wingate.csv",
+    "sbj_1_I.csv"
+  ],
+  "csv_trial_2": [
+    "sbj_1_II.csv",
+    "sbj_1_incremental.csv",
+    "sbj_1_I.csv",
+    "sbj_1_Wingate.csv"
+  ],
+  "input": ["time", "power", "vo2", "cadence", "hr", "rf"]
+}
