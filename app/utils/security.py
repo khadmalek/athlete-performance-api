@@ -15,12 +15,20 @@ if not SECRET_KEY:
     raise ValueError("SECRET_KEY is not set in the .env file")
 
 def hash_password(password: str) -> str:
+    """_hash_password
+    """
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 def verify_password(password: str, hashed_password: str) -> bool:
+    """verify_password
+    """
     return bcrypt.checkpw(password.encode(), hashed_password.encode())
 
 def generate_token(username: str) -> str:
+    """generate_token
+        input: username
+        output: token
+    """
     expiration = datetime.utcnow() + timedelta(hours=72)  # Exemple de durée d'expiration
     payload = {
         "sub": username,

@@ -9,6 +9,16 @@ router = APIRouter(prefix="/performances", tags=["Performances"])
 
 # Fonction pour vérifier l'authentification via token
 def get_current_user(token: str):
+    """Vérifie l'authentification de l'utilisateur via le token fourni.
+    Args:
+        token (str): Token d'authentification
+
+    Raises:
+        HTTPException: Token invalide ou expiréiption_
+
+    Returns:
+        _type_: user["id_user"]
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id_user FROM users WHERE token = ?", (token,))
@@ -22,6 +32,15 @@ def get_current_user(token: str):
 
 # Fonction pour extraire le token de l'Authorization header
 def get_token_from_header(authorization: str = Header(None)):
+    """
+        Args: authorization (str, optional): champ Autorization dans header
+
+    Raises:
+        HTTPException: Token manquant dans les headers ou invalide
+
+    Returns:
+         token
+    """
     if not authorization:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token manquant dans les headers")
     token = authorization.split("Bearer ")[-1]  # Supposer que le format est 'Bearer <token>'
@@ -32,6 +51,23 @@ def get_token_from_header(authorization: str = Header(None)):
 # Créer une performance
 @router.post("/", response_model=PerformanceResponse)
 def create_performance(performance: PerformanceCreate, token: str = Depends(get_token_from_header)):
+    """Créer une performance pour l'utilisateur authentifié.
+    Args:
+        token (str): Token d'authentification
+        performance (PerformanceCreate): Données de performance à insérer
+
+    Post: http://localhost:8000/performance/performances/, 
+    Body:
+    {
+    "power_max": XXX,
+    "hr_max": XXX,
+    "vo2_max": XXX,
+    "rf_max": XXX,
+    "cadence_max": XXX,
+    "vo2_class": "XXX",
+    "ressenti": XXX
+    }
+    """
     id_user = get_current_user(token)
     date_performance = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Enregistre la date et l'heure actuelles
 
@@ -55,6 +91,12 @@ def create_performance(performance: PerformanceCreate, token: str = Depends(get_
 # Lire toutes les performances d'un utilisateur
 @router.get("/", response_model=List[PerformanceResponse])
 def get_performances(token: str = Depends(get_token_from_header)):
+    """Récupérer toutes les performances
+    Args:
+        token (str): Token d'authentification
+        
+    Get: http://localhost:8000/performance/performances/, 
+    """
     id_user = get_current_user(token)
 
     conn = get_db_connection()
@@ -68,6 +110,18 @@ def get_performances(token: str = Depends(get_token_from_header)):
 # Lire une seule performance par ID
 @router.get("/{id_performance}", response_model=PerformanceResponse)
 def get_performance(id_performance: int, token: str = Depends(get_token_from_header)):
+    """Récupérer une performance par son ID.
+
+    Args:
+        id_performance (int): performance ID
+        token (str): Token d'authentification
+
+    Raises:
+        HTTPException: "Performance introuvable"
+
+    Returns:
+        _type_: PerformanceResponse
+    """
     id_user = get_current_user(token)
 
     conn = get_db_connection()
@@ -84,6 +138,18 @@ def get_performance(id_performance: int, token: str = Depends(get_token_from_hea
 # Mettre à jour une performance
 @router.put("/{id_performance}", response_model=PerformanceResponse)
 def update_performance(id_performance: int, performance: PerformanceCreate, token: str = Depends(get_token_from_header)):
+    """Mettre à jour une performance.
+    Args:
+        id_performance (int): _description_
+        performance (PerformanceCreate): _description_
+        token (str): Token d'authentification
+
+    Raises:
+        HTTPException: Performance introuvable
+
+    Returns:
+        PerformanceResponse: Performance mise à jour
+    """
     id_user = get_current_user(token)
 
     conn = get_db_connection()
@@ -113,6 +179,18 @@ def update_performance(id_performance: int, performance: PerformanceCreate, toke
 # Supprimer une performance
 @router.delete("/{id_performance}", response_model=PerformanceResponse, status_code=status.HTTP_200_OK)
 def delete_performance(id_performance: int, token: str = Depends(get_token_from_header)):
+    """Supprimer une performance.
+
+    Args:
+        id_performance (int): ID de la performance à supprimer
+        token (str): Token d'authentification
+
+    Raises:
+        HTTPException: Performance introuvable
+
+    Returns:
+        PerformanceResponse: Performance supprimée
+    """
     id_user = get_current_user(token)
 
     conn = get_db_connection()
@@ -139,6 +217,13 @@ def delete_performance(id_performance: int, token: str = Depends(get_token_from_
 # Lire puissance max
 @router.get("/puissance/details")
 def get_performance(token: str = Depends(get_token_from_header)):
+    """Récupérer la performance avec la puissance maximale.
+        
+        token (str): Token d'authentification
+        Returns:
+        Performance maximale
+
+    """
     id_user = get_current_user(token)
 
 
@@ -179,9 +264,12 @@ def get_performance(token: str = Depends(get_token_from_header)):
 # Lire puissance max
 @router.get("/puissance/detail/{id_user}")
 def get_performance(id_user: int, token: str = Depends(get_token_from_header)):
-    #id_user = get_current_user(token)
-
-
+    """Récupérer pour un utilisateur donnée la performance avec la puissance maximale.
+        
+        token (str): Token d'authentification
+        Returns:
+                Performance maximale
+    """
     conn = get_db_connection()
     conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
     cursor = conn.cursor()
@@ -220,7 +308,13 @@ def get_performance(id_user: int, token: str = Depends(get_token_from_header)):
 # Lire VO2max max
 @router.get("/VO2max/details")
 def get_performance(token: str = Depends(get_token_from_header)):
-  
+    """Récupérer la performance avec VO2max.
+        
+        token (str): Token d'authentification
+        Returns:
+        l'athlète avec la performance maximale (VO2max)
+
+    """
     conn = get_db_connection()
     conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
     cursor = conn.cursor()
@@ -258,7 +352,13 @@ def get_performance(token: str = Depends(get_token_from_header)):
 # Lire VO2max max
 @router.get("/VO2max/detail/{id_user}")
 def get_performance(id_user: int, token: str = Depends(get_token_from_header)):
-  
+    """Récupérer pour un utilisateur la performance avec VO2max.
+        
+        token (str): Token d'authentification
+        Returns:
+        l'athlète avec la performance maximale (VO2max)
+
+    """
     conn = get_db_connection()
     conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
     cursor = conn.cursor()
@@ -297,6 +397,13 @@ def get_performance(id_user: int, token: str = Depends(get_token_from_header)):
 # Lire rapport poids/puissance max
 @router.get("/poidspuissance/details")
 def get_performances(token: str = Depends(get_token_from_header)): 
+    """Récupérer le meilleur rapport puissance max / poids moyenne .
+        
+        token (str): Token d'authentification
+        Returns:
+        l'athlète avec le rapport puissance max / poids maximum
+
+    """
     conn = get_db_connection()
     conn.row_factory = sqlite3.Row  # Accéder aux colonnes par nom
     cursor = conn.cursor()

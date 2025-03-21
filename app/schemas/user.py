@@ -3,6 +3,9 @@ from typing import Optional
 
 # Schéma pour la création d'un utilisateur
 class UserCreate(BaseModel):
+    """
+    Schéma de création d'un utilisateur
+    """
     username: str
     nom: str
     prenom: str
@@ -15,6 +18,9 @@ class UserCreate(BaseModel):
 
 # Schéma pour la réponse d'un utilisateur (sans mot de passe)
 class UserResponse(BaseModel):
+    """
+    Schéma pour la réponse d'un utilisateur
+    """
     id_user: int
     username: str
     nom: str

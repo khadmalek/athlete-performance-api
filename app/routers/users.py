@@ -6,9 +6,28 @@ from app.utils.security import generate_token, hash_password
 router = APIRouter(prefix="/users", tags=["Users"])
 
 # Création d'un utilisateur
-
 @router.post("/", response_model=UserResponse)
 def create_user(user: UserCreate):
+    """Create a new user.
+
+    Args:
+        user (UserCreate):
+
+    Raises:
+        HTTPException:  User already exists
+
+    Returns:
+        UserResponse: User created successfully
+    
+    Post: localhost:8000/admin/users/, Body:{
+    "username": "_username",
+    "nom": "_nom",
+    "prenom": "_prenom",
+    "email": "_email@example.com",
+    "password": "_passwo",
+    "role": "athlete"
+    }
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -37,6 +56,19 @@ def create_user(user: UserCreate):
 # Récupérer un utilisateur par son ID
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int):
+    """Recupérer un utilisateur par son ID.
+
+    Args:
+        user_id (int): id de l'utilisateur
+
+    Raises:
+        HTTPException: User not found
+
+    Returns:
+       UserResponse: User found successfully
+    
+    Get: localhost:8000/admin/users/1
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT id_user, username, nom, prenom, email, token, role FROM users WHERE id_user = ?", (user_id,))
@@ -51,6 +83,31 @@ def get_user(user_id: int):
 # Mettre à jour un utilisateur
 @router.put("/{user_id}", response_model=UserResponse)
 def update_user(user_id: int, user: UserCreate):
+    """Mis à jour d'un utilisateur.
+
+    Args:
+        user_id (int): id de l'utilisateur
+
+    Raises:
+        HTTPException: Email already in use
+        HTTPException: User not found
+        HTTPException: Username already in use
+
+    Returns:
+        UserResponse: User updated successfully
+
+    Put: localhost:8000/admin/users/1, 
+    Body:
+    {
+    "username": "_username",
+    "nom": "_nom",
+    "prenom": "_prenom",
+    "email": "mail@example.com",
+    "password": "_password",
+    "role": "coach"
+    }
+
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -88,6 +145,14 @@ def update_user(user_id: int, user: UserCreate):
 # Supprimer un utilisateur
 @router.delete("/{user_id}")
 def delete_user(user_id: int):
+    """supprimer un utilisateur.
+
+    Args:
+        user_id (int): id de l'utilisateur
+
+    Returns:
+        "message": "User deleted successfully"
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
 

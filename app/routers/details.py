@@ -6,7 +6,19 @@ router = APIRouter(prefix="/details", tags=["Details"])
 
 @router.post("/{id_user}", response_model=DetailsResponse)
 def create_details(id_user: int, details: DetailsCreate):
-    """Créer des détails pour un utilisateur."""
+    """Créer des détails pour un utilisateur.
+   
+    Input: id_user, details
+
+    Post: localhost:8000/admin/details/{id_user}, 
+    
+    Body:{
+    "gender": "XXXX",
+    "age": XX,
+    "weight": XX,
+    "height": XXX
+    }
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -57,7 +69,14 @@ def create_details(id_user: int, details: DetailsCreate):
 
 @router.get("/{id_user}", response_model=DetailsResponse)
 def get_details(id_user: int):
-    """Récupérer les détails d'un utilisateur."""
+    """Récupérer les détails d'un utilisateur.
+
+    Input: id_user
+
+    Get, localhost:8000/admin/users/{id_user}
+    
+    Output: details"""
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM details WHERE id_user = ?", (id_user,))
@@ -71,7 +90,22 @@ def get_details(id_user: int):
 
 @router.put("/{id_user}")
 def update_details(id_user: int, details: DetailsCreate):
-    """Mettre à jour les détails d'un utilisateur."""
+    """Mettre à jour les détails d'un utilisateur.
+
+    Input: id_user, details
+
+    Put: localhost:8000/admin/users/{id_user}, 
+    Body:{
+    "username": "_username",
+    "nom": "_nom",
+    "prenom": "_prenom",
+    "email": "mail@example.com",
+    "password": "_password",
+    "role": "coach"
+    }
+    
+    Output: {"message": "Details updated successfully"}"""
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -94,7 +128,14 @@ def update_details(id_user: int, details: DetailsCreate):
 
 @router.delete("/{id_user}")
 def delete_details(id_user: int):
-    """Supprimer les détails d'un utilisateur."""
+    """Supprimer les détails d'un utilisateur.
+
+    Input: id_user
+
+    Delete: localhost:8000/admin/users/{id_user}
+    
+    Output: {"message": "Details deleted successfully"}"""
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
